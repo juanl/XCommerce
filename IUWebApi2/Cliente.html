@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Product App</title>
+</head>
+<body>
+
+    <div>
+        <h2>Todos los clientes</h2>
+        <ul id="clientes" />
+    </div>
+    <div>
+        <h2>Buscar por ID</h2>
+        <input type="text" id="clienteId" size="5" />
+        <input type="button" value="Buscar" onclick="find();" />
+        <p id="cliente" />
+    </div>
+    <div>
+        <h2>Borrar por ID</h2>
+        <input type="text" id="clienteIdBorrar" size="5" />
+        <input type="button" value="Borrar" onclick="borrar();" />
+        <p id="mensajeBorrado" />
+    </div>
+
+    <div>
+        <div class="panel-body">
+            <form id="NuevoCliente" class="form-horizontal" method="post" action="javascript:EnviarForm()">
+                <div class="form-group">
+                    Domicilio
+                    Apellido { get; set; }
+                    Nombre { get; set; }
+                    DNI { get; set; }
+                    <label for="Nombre" class="col-sm-2 control-label">Nombre</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="Nombre" name="Nombre" />
+                    </div>
+                    <label for="Apellido" class="col-sm-2 control-label">Apellido</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="Apellido" name="Apellido" />
+                    </div>
+
+                    <label for="DNI" class="col-sm-2 control-label">DNI</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="DNI" name="DNI" />
+                    </div>
+
+                    <label for="Domicilio" class="col-sm-2 control-label">Domicilio</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="Domicilio" name="Domicilio" />
+                    </div>
+
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+
+        </div>
+    </div>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'api/cliente';
+
+        $(document).ready(function () {
+            // Send an AJAX request
+            $.getJSON(uri)
+                .done(function (data) {
+                    // On success, 'data' contains a list of products.
+                    $.each(data, function (key, item) {
+                        // Add a list item for the product.
+                        $('<li>', { text: formatItem(item) }).appendTo($('#clientes'));
+                    });
+                });
+        });
+
+        function formatItem(item) {
+            return item.Nombre + ' ' + item.Apellido;
+        }
+        function EnviarForm() {
+            $.post("/api/Cliente", $("#NuevoCliente").serialize())
+                .done(function () {
+                    alert("second success");
+                }).fail(function () {
+                    alert("error");
+                }).always(function () {
+                    alert("finished");
+                });
+        }
+        function find() {
+            var id = $('#clienteId').val();
+            $.getJSON(uri + '/' + id)
+                .done(function (data) {
+                    $('#cliente').text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $('#cliente').text('Error: ' + err);
+                });
+        }
+        function borrar() {
+            var id = $('#clienteIdBorrar').val();
+            $.ajax({
+                url: uri + '/' + id,
+                type: 'DELETE',                
+                success: function (result) {
+                    $('#mensajeBorrado').text("borrado");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
